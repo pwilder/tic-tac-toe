@@ -1,3 +1,20 @@
-<h1>
-  {{title}}
-</h1>
+<div >
+    <h1>{{title}}</h1>
+    
+    <table>
+        <tr *ngFor="let row of collections">
+            <td *ngFor="let square of row" (click)="handleClicked(square)">
+                {{square.val}}
+            </td>
+        </tr>    
+    </table>
+</div>
+
+Selected Value is : 
+<p *ngIf="selected" >
+{{selected.id}}
+</p>
+<p *ngIf="winner" >
+We have a winner!
+    <button (click)="this.reset()">Reset</button>
+</p>
