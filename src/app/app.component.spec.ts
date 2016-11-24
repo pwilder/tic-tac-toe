@@ -2,6 +2,7 @@
 
 import { TestBed, async } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { Logger } from './logger.service';
 
 describe('App: AngTest', () => {
   
@@ -11,6 +12,7 @@ describe('App: AngTest', () => {
       declarations: [
         AppComponent
       ],
+      providers: [Logger]
     });
     
   });
@@ -61,14 +63,6 @@ describe('App: AngTest', () => {
     let cellArray:Array<HTMLElement> = createFlatCellArray(fixture);
     let selectCount:number = 0;
     
-    let initState = "";
-    for (let collection of app.collections) {
-      for (let square of collection) {
-        initState += square.val + " ";
-      }
-    }
-    console.log(initState);
-    
     for (let cell of cellArray) {
         cell.click();
         let expectedVal;
@@ -77,17 +71,14 @@ describe('App: AngTest', () => {
         } else {
           expectedVal = 'O';
         }
-        let oldVal = app.selected.val;
-        expect(oldVal).toEqual(expectedVal); 
-        cell.click();
-        let newVal = app.selected.val;
         expect(app.selected.val).toEqual(expectedVal); 
-        console.log(oldVal + " " + newVal);
+        cell.click();
+        expect(app.selected.val).toEqual(expectedVal); 
     }
   }));
   
   it("clears all fields when reset is clicked", async(() => {
-     let appComponent = new AppComponent();
+     let appComponent = new AppComponent(new MockLogger());
      
      for (let row of appComponent.collections) {
        for (let square of row) {
@@ -107,7 +98,7 @@ describe('App: AngTest', () => {
   }))
   
   it("sets the winner when a horizontal line is made", async(() => {
-     let appComponent = new AppComponent();
+     let appComponent = new AppComponent(new MockLogger());
      appComponent.players = 1
      for (let rowIdx = 0; rowIdx < 3; rowIdx++) {
        for (let colIdx = 0; colIdx < 3; colIdx++) {
@@ -119,7 +110,7 @@ describe('App: AngTest', () => {
   }))
   
   it("sets the winner when a vertical line is made", async(() => {
-     let appComponent = new AppComponent();
+     let appComponent = new AppComponent(new MockLogger());
      appComponent.players = 1
      for (let colIdx = 0; colIdx < 3; colIdx++) {
        for (let rowIdx = 0; rowIdx < 3; rowIdx++) {
@@ -130,8 +121,8 @@ describe('App: AngTest', () => {
      }
   }))
   
-  it("sets the winner when a backwards slash line is made", async(() => {
-     let appComponent = new AppComponent();
+  it("sets the winner when a diagonal line is made", async(() => {
+     let appComponent = new AppComponent(new MockLogger());
      appComponent.players = 1
      for (let idx = 0; idx < 3; idx++) {
        appComponent.handleClicked(appComponent.getSquare(idx, idx));
@@ -139,17 +130,49 @@ describe('App: AngTest', () => {
      }
      expect(appComponent.winner).toEqual(true);
      appComponent.reset();
-  }))
-  
-  it("sets the winner when a foward slash line is made", async(() => {
-     let appComponent = new AppComponent();
-     appComponent.players = 1
+     
      for (let idx = 0; idx < 3; idx++) {
        appComponent.handleClicked(appComponent.getSquare(idx, 2 - idx));
        
      }
      expect(appComponent.winner).toEqual(true);
      appComponent.reset();
+  }))
+  
+  it("boardFull  is set when all squares are full", async(() => {
+     let appComponent = new AppComponent(new MockLogger());
+     appComponent.players = 1
+     appComponent.winConditionEnabled = false;
+     expect(appComponent.boardFull).toEqual(false);
+     for (let row of appComponent.collections) {
+       for (let square of row) {
+         appComponent.handleClicked(square);
+       }
+     }
+     
+     expect(appComponent.boardFull).toEqual(true);
+     appComponent.reset();
+     expect(appComponent.boardFull).toEqual(false);
+  }))
+  
+  /**
+   * FWIW, I appreciate that this is an exceptionally fragile test. It effectively prevents me from 
+   * adding new info logs (typically something we want to encourage) without potentially breaking this test.
+   *
+   * At the time of writing this test more about the succesful use of mocks than it was about adding test value.
+   */
+  it("logs an info message when there is a winner", async(() => {
+     let mockLogger:MockLogger = new MockLogger();
+     let appComponent = new AppComponent(mockLogger);
+     appComponent.players = 1;
+     
+     
+     for (let square of appComponent.collections[0]) {
+       appComponent.handleClicked(square);
+     }
+     
+     
+     expect(mockLogger.logTracker.info.length).toEqual(1);
   }))
   
   function createFlatCellArray(fixture) : Array<HTMLElement> {
@@ -170,5 +193,40 @@ describe('App: AngTest', () => {
     }
     
     return returnArray; 
+  }
+  
+  class MockLogger extends Logger {
+    logTracker = {
+      fatal: [],
+      error: [],
+      warn: [],
+      info: [],
+      debug: [],
+      trace: []
+    }
+    
+    fatal(message:string) {
+      this.logTracker.fatal.push(message);
+    }
+
+    error(message:string) {
+      this.logTracker.error.push(message);
+    }
+
+    warn(message:string) {
+      this.logTracker.warn.push(message);
+    }
+
+    info(message:string) {
+      this.logTracker.info.push(message);
+    }
+
+    debug(message:string) {
+      this.logTracker.debug.push(message);
+    }
+
+    trace(message:string) {
+      this.logTracker.trace.push(message);
+    }
   }
 });

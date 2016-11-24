@@ -16,5 +16,9 @@ Selected Value is :
 </p>
 <p *ngIf="winner" >
 We have a winner!
-    <button (click)="this.reset()">Reset</button>
+<button (click)="this.reset()">Reset</button>
+</p>
+<p *ngIf="boardFull" >
+We have a tie, care to try again?
+<button (click)="this.reset()">Reset</button>
 </p>

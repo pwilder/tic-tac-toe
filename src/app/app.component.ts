@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { Square } from './Square'
+import { Square } from './square';
+import { Logger } from './logger.service';
 
 @Component({
   selector: 'app-root',
@@ -7,21 +8,25 @@ import { Square } from './Square'
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  players = 2;
-  nextPlayer = 0;
+  players:number = 2;
+  nextPlayer:number = 0;
   symbols = ['X', 'O'];
   title:string = "Tic-tac-toe"
   winner:boolean = false;
-  winConditionEnabled = true;
+  occupiedSquares:number = 0;
+  boardFull:boolean = false;
+  winConditionEnabled:boolean = true;
   
-  collections: Array<Array<Square>> = [
+  constructor(private logger:Logger) {}
+  
+  collections:Array<Array<Square>> = [
     [{id:0, val:null}, {id:1, val:null}, {id:2, val:null}],
     [{id:3, val:null}, {id:4, val:null}, {id:5, val:null}],
     [{id:6, val:null}, {id:7, val:null}, {id:8, val:null}]
   ];
   selected:Square= null;
   
-  handleClicked(clickedVal) {
+  handleClicked(clickedVal):void {
      if ((clickedVal.val != null) || this.winner) { 
         return;
      }
@@ -31,9 +36,13 @@ export class AppComponent {
      if (this.winConditionEnabled) {
        this.updateWinner();
      }
+     
+     if (++this.occupiedSquares == 9) {
+       this.boardFull = true;
+     }
   }
   
-  reset() {
+  reset():void {
     for (let row of this.collections) {
       for (let square of row) { 
         square.val = null;
@@ -42,17 +51,19 @@ export class AppComponent {
     
     this.selected = null;
     this.winner = false;
+    this.boardFull = false;
   }
   
-  updateWinner() {
+  updateWinner():void {
     if(this.hasHorizontalWin() ||
        this.hasVerticalWin() ||
        this.hasDiagonalWin()) {
-      this.winner = true;
+       this.winner = true;
+       this.logger.info("There is a winner");
     }
   }
   
-  hasHorizontalWin():Boolean {
+  hasHorizontalWin():boolean {
     for (let rowIdx = 0; rowIdx < 3; rowIdx++) {
       let squareArray:Array<Square> = []
       for (let colIdx = 0; colIdx < 3; colIdx++) {
@@ -65,7 +76,7 @@ export class AppComponent {
     }
   }
   
-  hasVerticalWin():Boolean {
+  hasVerticalWin():boolean {
     for (let colIdx = 0; colIdx < 3; colIdx++) {
       let squareArray:Array<Square> = []
       for (let rowIdx = 0; rowIdx < 3; rowIdx++) {
@@ -78,7 +89,7 @@ export class AppComponent {
     }
   }
   
-  hasDiagonalWin():Boolean {
+  hasDiagonalWin():boolean {
     const maxCol = 2;
     let lineCollection:Array<Array<Square>> = [[], []]
     for (let idx = 0; idx < 3; idx++) {
@@ -94,7 +105,7 @@ export class AppComponent {
     
   }
   
-  hasSame(squareArray:Array<Square>):Boolean {
+  hasSame(squareArray:Array<Square>):boolean {
      if (squareArray == null || squareArray.length == 0) {
        return false;
      }
@@ -115,7 +126,7 @@ export class AppComponent {
      return true;
   }
   
-  getSquare(rowIdx:number, colIdx:number) {
+  getSquare(rowIdx:number, colIdx:number):Square {
     return this.collections[rowIdx][colIdx];
   }
   
