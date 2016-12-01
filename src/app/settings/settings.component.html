@@ -1,0 +1,17 @@
+
+<h3>Settings</h3>
+
+<select [(ngModel)] = "playerNum">
+        <option value="1">1</option>
+        <option value="2">2</option>
+    </select>
+{{playerNum}}    
+    
+    <br>
+    <select [(ngModel)] = "winConditionEnabled">
+        <option value="true">Enabled</option>
+        <option value="false">Disabled</option>
+    </select>
+{{winConditionEnabled}}
+<br>
+<button type="button" class="export" (click)="handleClick($event)">New Game</button>

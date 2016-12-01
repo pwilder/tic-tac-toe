@@ -4,8 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
-import { Logger } from './logger.service';
-import { ConsoleLogger } from './console-logger.service';
+import { Logger } from './logging/logger.service';
+import { ConsoleLogger } from './logging/console-logger.service';
+import { SettingsModule } from './settings/settings.module';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { ConsoleLogger } from './console-logger.service';
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule
+    HttpModule, 
+    SettingsModule
   ],
   providers: [{provide: Logger, useClass: ConsoleLogger}],
   bootstrap: [AppComponent]

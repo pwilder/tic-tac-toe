@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Square } from './square';
-import { Logger } from './logger.service';
+import { Logger } from './logging/logger.service';
+import { Settings } from './settings/settings';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +17,7 @@ export class AppComponent {
   occupiedSquares:number = 0;
   boardFull:boolean = false;
   winConditionEnabled:boolean = true;
+  settings:Settings;
   
   constructor(private logger:Logger) {}
   
@@ -33,6 +35,7 @@ export class AppComponent {
      clickedVal.val = this.symbols[this.nextPlayer];
      this.nextPlayer = ++this.nextPlayer % this.players;
      this.selected = clickedVal;
+     
      if (this.winConditionEnabled) {
        this.updateWinner();
      }
@@ -52,6 +55,8 @@ export class AppComponent {
     this.selected = null;
     this.winner = false;
     this.boardFull = false;
+    this.occupiedSquares = 0;
+    this.logger.info("Game Reset");
   }
   
   updateWinner():void {
@@ -128,6 +133,13 @@ export class AppComponent {
   
   getSquare(rowIdx:number, colIdx:number):Square {
     return this.collections[rowIdx][colIdx];
+  }
+  
+  onNewSettings(newSettings:Settings) {
+    console.log(newSettings)
+    this.players = newSettings.players;
+    this.winConditionEnabled = newSettings.winConditionEnabled;
+    this.reset();
   }
   
 }

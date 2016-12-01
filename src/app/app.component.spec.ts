@@ -2,7 +2,10 @@
 
 import { TestBed, async } from '@angular/core/testing';
 import { AppComponent } from './app.component';
-import { Logger } from './logger.service';
+import { Logger } from './logging/logger.service';
+import { SettingsModule } from './settings/settings.module';
+import { By }           from '@angular/platform-browser';
+import { Settings } from './settings/settings';
 
 describe('App: AngTest', () => {
   
@@ -11,6 +14,9 @@ describe('App: AngTest', () => {
     TestBed.configureTestingModule({
       declarations: [
         AppComponent
+      ],
+      imports: [
+        SettingsModule
       ],
       providers: [Logger]
     });
@@ -23,20 +29,7 @@ describe('App: AngTest', () => {
     expect(app.title).toEqual(expectedTitle);
   }));
   
-  it('should have a 3x3 table', async(() => {
-    let fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    let compiled = fixture.debugElement.nativeElement;
-    let table = compiled.querySelector('table')
-    let childArray = table.querySelectorAll('tr');
-    expect(childArray.length).toEqual(3)
-    for (let i = 0; i < childArray.length; i++) {
-        let currentRow = childArray[i];
-        let colArray = currentRow.querySelectorAll('td')
-        expect(colArray.length).toEqual(3);
-    }
-  }));
-  
+  /**
   it('should have every table cell respond to clicks', async(() => {
     let fixture = TestBed.createComponent(AppComponent);
     let app = fixture.debugElement.componentInstance;
@@ -55,27 +48,7 @@ describe('App: AngTest', () => {
         expect(app.selected.val).toEqual(expectedVal); 
     }
   }));
-  
-  it('subsequent clicks on the same cell are ignored.', async(() => {
-    let fixture = TestBed.createComponent(AppComponent);
-    let app = fixture.debugElement.componentInstance;
-    app.winConditionEnabled = false;
-    let cellArray:Array<HTMLElement> = createFlatCellArray(fixture);
-    let selectCount:number = 0;
-    
-    for (let cell of cellArray) {
-        cell.click();
-        let expectedVal;
-        if (selectCount++ % 2 == 0) {
-          expectedVal = 'X';
-        } else {
-          expectedVal = 'O';
-        }
-        expect(app.selected.val).toEqual(expectedVal); 
-        cell.click();
-        expect(app.selected.val).toEqual(expectedVal); 
-    }
-  }));
+  */
   
   it("clears all fields when reset is clicked", async(() => {
      let appComponent = new AppComponent(new MockLogger());
@@ -173,6 +146,25 @@ describe('App: AngTest', () => {
      
      
      expect(mockLogger.logTracker.info.length).toEqual(1);
+  }))
+  
+  it("starts a new game when it receives new settings", async(() => {
+     let mockLogger:MockLogger = new MockLogger();
+     let appComponent = new AppComponent(mockLogger);
+     appComponent.players = 1;
+     
+     
+     for (let square of appComponent.collections[0]) {
+       appComponent.handleClicked(square);
+     }
+     
+     appComponent.onNewSettings(new Settings(1, false))
+     expect(appComponent.players).toBe(1);
+     expect(appComponent.winConditionEnabled).toBe(false);
+     
+     for (let square of appComponent.collections[0]) {
+       expect(square.val).toEqual(null);
+     }
   }))
   
   function createFlatCellArray(fixture) : Array<HTMLElement> {
