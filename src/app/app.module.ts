@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { Logger } from './logging/logger.service';
 import { ConsoleLogger } from './logging/console-logger.service';
 import { SettingsModule } from './settings/settings.module';
+import { BoardModule } from './board/board.module';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { SettingsModule } from './settings/settings.module';
     BrowserModule,
     FormsModule,
     HttpModule, 
-    SettingsModule
+    SettingsModule,
+    BoardModule
   ],
   providers: [{provide: Logger, useClass: ConsoleLogger}],
   bootstrap: [AppComponent]

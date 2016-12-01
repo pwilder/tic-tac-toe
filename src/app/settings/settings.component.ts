@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {EventEmitter, Output } from '@angular/core';
 import { Logger } from '../logging/logger.service';
-import { Settings } from './settings'
+import { Settings } from '../settings'
 
 @Component({
   selector: 'settings',

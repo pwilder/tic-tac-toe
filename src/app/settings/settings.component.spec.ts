@@ -2,14 +2,14 @@
 
 import { Component } from '@angular/core';
 
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule }        from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { TestBed, async } from '@angular/core/testing';
 import { SettingsComponent } from './settings.component';
-import { Settings } from './settings'
+import { Settings } from '../settings'
 import { Logger } from '../logging/logger.service';
 import { By }           from '@angular/platform-browser';
 
@@ -20,9 +20,8 @@ describe('Settings comp', () => {
         SettingsComponent
       ],
       imports: [
-        BrowserModule,
-        FormsModule,
-        HttpModule
+        CommonModule,
+        FormsModule
       ],
       providers: [Logger]
     });  

@@ -5,26 +5,5 @@
     <settings (onNew)="onNewSettings($event)"></settings>
 </div>
 <div class="main">
-
-    <table class="solidBorders">
-        <tr *ngFor="let row of collections" class="solidBorders">
-            <td *ngFor="let square of row" (click)="handleClicked(square)" class="solidBorders boardPadding">
-                {{square.val}}
-            </td>
-        </tr>    
-    </table>
-    
-
-    Selected Value is : 
-    <p *ngIf="selected" >
-      {{selected.id}}
-    </p>
-    <p *ngIf="winner" >
-      We have a winner!
-      <button (click)="this.reset()">Reset</button>
-    </p>
-    <p *ngIf="boardFull" >
-      We have a tie, care to try again?
-      <button (click)="this.reset()">Reset</button>
-    </p>
+    <ttt-board [settings]="settings"></ttt-board>
 </div>
