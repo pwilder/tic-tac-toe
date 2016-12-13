@@ -1,3 +1,10 @@
+<p *ngIf="id == null">
+    Loading...
+</p>
+<p *ngIf="id != null">
+    Game ID is: {{id}}
+</p>
+
 <table class="solidBorders">
     <tr *ngFor="let row of collections" class="solidBorders">
         <td *ngFor="let square of row" (click)="handleClicked(square)" class="solidBorders boardPadding">

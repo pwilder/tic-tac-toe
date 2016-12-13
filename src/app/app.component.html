@@ -1,9 +1,9 @@
-<div class="top">
+<div>
     <h1>{{title}}</h1>
+    <nav class="center">
+        <a routerLink="/introduction">Introduction</a>
+        <a routerLink="/game">Game</a>
+    </nav>
 </div>
-<div class="left">
-    <settings (onNew)="onNewSettings($event)"></settings>
-</div>
-<div class="main">
-    <ttt-board [settings]="settings"></ttt-board>
-</div>
+<hr>
+<router-outlet></router-outlet>

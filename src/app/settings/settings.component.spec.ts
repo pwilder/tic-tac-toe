@@ -9,7 +9,7 @@ import { HttpModule } from '@angular/http';
 
 import { TestBed, async } from '@angular/core/testing';
 import { SettingsComponent } from './settings.component';
-import { Settings } from '../settings'
+import { Settings } from '../game/settings'
 import { Logger } from '../logging/logger.service';
 import { By }           from '@angular/platform-browser';
 
@@ -23,7 +23,7 @@ describe('Settings comp', () => {
         CommonModule,
         FormsModule
       ],
-      providers: [Logger]
+      providers: [{provide: Logger, useClass: QuietLogger}]
     });  
   });
   
@@ -47,3 +47,9 @@ describe('Settings comp', () => {
      expect(newSettings).toEqual(expectedSettings);
   }))
 })
+
+class QuietLogger extends Logger {  
+  log(level:string, message:string) {
+    
+  }
+}

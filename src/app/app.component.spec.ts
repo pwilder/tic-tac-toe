@@ -2,11 +2,12 @@
 
 import { TestBed, async } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
 import { Logger } from './logging/logger.service';
-import { SettingsModule } from './settings/settings.module';
-import { BoardModule } from './board/board.module';
+import { IntroModule } from './intro/intro.module';
+import { GameModule } from './game/game.module';
 import { By }           from '@angular/platform-browser';
-import { Settings } from './settings/settings';
+import {APP_BASE_HREF} from '@angular/common';
 
 describe('App: AngTest', () => {
   
@@ -17,9 +18,10 @@ describe('App: AngTest', () => {
         AppComponent
       ],
       imports: [
-        SettingsModule, BoardModule
+        IntroModule, GameModule, AppRoutingModule
       ],
-      providers: [Logger]
+      providers: [Logger, 
+      {provide: APP_BASE_HREF, useValue : '/' }]
     });
     
   });
@@ -28,6 +30,12 @@ describe('App: AngTest', () => {
     let fixture = TestBed.createComponent(AppComponent); 
     let app = fixture.debugElement.componentInstance;
     expect(app.title).toEqual(expectedTitle);
+  }));
+  
+  it(`should have a navigation bar`, async(() => {
+    let fixture = TestBed.createComponent(AppComponent); 
+    let nav = fixture.debugElement.nativeElement.querySelector('nav');
+    expect(nav).not.toBeNull();
   }));
   
   class MockLogger extends Logger {
@@ -65,3 +73,4 @@ describe('App: AngTest', () => {
     }
   }
 });
+

@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {EventEmitter, Output } from '@angular/core';
 import { Logger } from '../logging/logger.service';
-import { Settings } from '../settings'
+import { Settings } from '../game/settings'
 
 @Component({
   selector: 'settings',
@@ -19,6 +19,6 @@ export class SettingsComponent {
   handleClick(clickedValue) {
       let boolWinCondition = this.winConditionEnabled == "true";
       this.onNew.emit(new Settings(this.playerNum, boolWinCondition));
-      console.log("Handle New Game click");
+      this.logger.info("Handle new game click")
   }
 }

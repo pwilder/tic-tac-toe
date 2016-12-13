@@ -1,7 +1,9 @@
-import { Component, Input} from '@angular/core';
+import { Component, Input, OnInit} from '@angular/core';
 import { Square } from './square';
 import { Logger } from '../logging/logger.service';
-import { Settings } from '../settings';
+import { Settings } from '../game/settings';
+import { GameService } from '../game/game.service'
+import { Move, MoveBuilder } from '../game/move'
 
 @Component({
   selector: 'ttt-board',
@@ -9,6 +11,7 @@ import { Settings } from '../settings';
   styleUrls: ['./board.component.css']
 })
 export class BoardComponent {
+  id:string;
   nextPlayer:number = 0;
   symbols = ['X', 'O'];
   winner:boolean = false;
@@ -16,12 +19,12 @@ export class BoardComponent {
   boardFull:boolean = false;
   _settings:Settings = new Settings();
   
-  constructor(private logger:Logger) {}
+  constructor(private logger:Logger, private gameService:GameService) {}
   
   collections:Array<Array<Square>> = [
-    [{id:0, val:null}, {id:1, val:null}, {id:2, val:null}],
-    [{id:3, val:null}, {id:4, val:null}, {id:5, val:null}],
-    [{id:6, val:null}, {id:7, val:null}, {id:8, val:null}]
+    [{id:0, val:null, row: 0, col: 0}, {id:1, val:null, row: 0, col: 1}, {id:2, val:null, row: 0, col: 2}],
+    [{id:3, val:null, row: 1, col: 0}, {id:4, val:null, row: 1, col: 1}, {id:5, val:null, row: 1, col: 2}],
+    [{id:6, val:null, row: 2, col: 0}, {id:7, val:null, row: 2, col: 1}, {id:8, val:null, row: 2, col: 2}]
   ];
   selected:Square = null;
   
@@ -29,6 +32,7 @@ export class BoardComponent {
      if ((clickedVal.val != null) || this.winner) { 
         return;
      }
+     let activePlayer:number = this.nextPlayer;
      clickedVal.val = this.symbols[this.nextPlayer];
      this.nextPlayer = ++this.nextPlayer % this._settings.players;
      this.selected = clickedVal;
@@ -40,9 +44,11 @@ export class BoardComponent {
      if (++this.occupiedSquares == 9 && !this.winner) {
        this.boardFull = true;
      }
+     let move:Move = new MoveBuilder().player(activePlayer).row(clickedVal.row).col(clickedVal.col).toMove();
+     this.gameService.commitMove(this.id, move);
   }
   
-  reset():void {
+  reset():Promise<any> {
     for (let row of this.collections) {
       for (let square of row) { 
         square.val = null;
@@ -55,6 +61,10 @@ export class BoardComponent {
     this.occupiedSquares = 0;
     this.nextPlayer = 0;
     this.logger.info("Game Reset");
+    return this.gameService.createGameInstance().then(
+      (num) => {
+        this.id = num;
+      }).catch((ex) => this.logger.error(ex));
   }
   
   updateWinner():void {
@@ -135,7 +145,7 @@ export class BoardComponent {
 
   @Input() 
   set settings(settings: Settings) {
-     this.logger.info("Settings updated")
+     this.logger.info("Settings updated?")
      this._settings = settings;
      this.reset();
   }

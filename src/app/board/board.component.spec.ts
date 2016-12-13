@@ -3,25 +3,30 @@
 import { TestBed, async } from '@angular/core/testing';
 import { BoardComponent } from './board.component';
 import { Logger } from '../logging/logger.service';
+import { ConsoleLogger } from '../logging/console-logger.service';
 import { By }           from '@angular/platform-browser';
-import { Settings } from '../settings/settings';
+import { Settings } from '../game/settings';
+import { GameService } from '../game/game.service';
 
 describe('Board: BoardTest', () => {
   
-  beforeEach(() => {
+  let boardComponent;
+  let fixture;
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
         BoardComponent
       ],
-      providers: [Logger]
+       providers: [{provide: Logger, useClass: QuietLogger}, 
+         GameService]
     });
-    
-  });
+    fixture = TestBed.createComponent(BoardComponent);
+    boardComponent = fixture.debugElement.componentInstance;
+    boardComponent.settings = new Settings();
+  }));
   
-  /**
+  
   it('should have every table cell respond to clicks', async(() => {
-    let fixture = TestBed.createComponent(BoardComponent);
-    let boardComponent = fixture.debugElement.componentInstance;
     boardComponent._settings.winConditionEnabled = false;
     let cellArray:Array<HTMLElement> = createFlatCellArray(fixture);
     let selectCount:number = 0;
@@ -34,14 +39,12 @@ describe('Board: BoardTest', () => {
         } else {
           expectedVal = 'O';
         }
-        expect(app.selected.val).toEqual('expectedVal'); 
+        expect(boardComponent.selected.val).toEqual(expectedVal); 
     }
   }));
-  */
+  
   
   it("clears all fields when reset is clicked", async(() => {
-     let boardComponent = new BoardComponent(new MockLogger());
-     
      for (let row of boardComponent.collections) {
        for (let square of row) {
          boardComponent.handleClicked(square);
@@ -60,7 +63,6 @@ describe('Board: BoardTest', () => {
   }))
   
   it("sets the winner when a horizontal line is made", async(() => {
-     let boardComponent = new BoardComponent(new MockLogger());
      boardComponent._settings.players = 1
      for (let rowIdx = 0; rowIdx < 3; rowIdx++) {
        for (let colIdx = 0; colIdx < 3; colIdx++) {
@@ -72,7 +74,6 @@ describe('Board: BoardTest', () => {
   }))
   
   it("sets the winner when a vertical line is made", async(() => {
-     let boardComponent = new BoardComponent(new MockLogger());
      boardComponent._settings.players = 1
      for (let colIdx = 0; colIdx < 3; colIdx++) {
        for (let rowIdx = 0; rowIdx < 3; rowIdx++) {
@@ -84,7 +85,6 @@ describe('Board: BoardTest', () => {
   }))
   
   it("sets the winner when a diagonal line is made", async(() => {
-     let boardComponent = new BoardComponent(new MockLogger());
      boardComponent._settings.players = 1
      for (let idx = 0; idx < 3; idx++) {
        boardComponent.handleClicked(boardComponent.getSquare(idx, idx));
@@ -100,7 +100,6 @@ describe('Board: BoardTest', () => {
   }))
   
   it("boardFull  is set when all squares are full", async(() => {
-     let boardComponent = new BoardComponent(new MockLogger());
      boardComponent._settings.players = 1
      boardComponent._settings.winConditionEnabled = false;
      expect(boardComponent.boardFull).toEqual(false);
@@ -116,7 +115,6 @@ describe('Board: BoardTest', () => {
   }))
   
   it("nextPlayer is reset when reset is triggered", async(() => {
-     let boardComponent = new BoardComponent(new MockLogger());
      
      expect(boardComponent.nextPlayer).toEqual(0);
      boardComponent.handleClicked(boardComponent.collections[0][0]);
@@ -125,25 +123,28 @@ describe('Board: BoardTest', () => {
      expect(boardComponent.nextPlayer).toEqual(0);
   }))
   
-  /**
-   * FWIW, I appreciate that this is an exceptionally fragile test. It effectively prevents me from 
-   * adding new info logs (typically something we want to encourage) without potentially breaking this test.
-   *
-   * At the time of writing this test more about the succesful use of mocks than it was about adding test value.
-   */
-  it("logs an info message when there is a winner", async(() => {
-     let mockLogger:MockLogger = new MockLogger();
-     let boardComponent = new BoardComponent(mockLogger);
-     boardComponent._settings.players = 1;
-     
-     
-     for (let square of boardComponent.collections[0]) {
-       boardComponent.handleClicked(square);
-     }
-     
-     
-     expect(mockLogger.logTracker.info.length).toEqual(1);
-  }))
+  it(`on reset the id should change`, async(() => {
+    let promise = boardComponent.reset();
+    
+    promise.then(() => {
+      expect(boardComponent.id).not.toBeNull(); 
+    });
+  }));
+  
+  it('should increase the move list of the game with every click', async(() => {
+    boardComponent._settings.winConditionEnabled = false;
+    let cellArray:Array<HTMLElement> = createFlatCellArray(fixture);
+    let selectCount:number = 0;
+    let gs:GameService = fixture.debugElement.injector.get(GameService);
+    let spy = spyOn(gs, 'commitMove');
+    let gameId:string = boardComponent.id;
+    
+    for (let cell of cellArray) {
+      cell.click();
+    }
+    
+    expect(spy.calls.count()).toEqual(9);
+  }));
   
   function createFlatCellArray(fixture) : Array<HTMLElement> {
     let app = fixture.debugElement.componentInstance;
@@ -165,38 +166,10 @@ describe('Board: BoardTest', () => {
     return returnArray; 
   }
   
-  class MockLogger extends Logger {
-    logTracker = {
-      fatal: [],
-      error: [],
-      warn: [],
-      info: [],
-      debug: [],
-      trace: []
-    }
+  class QuietLogger extends Logger {
     
-    fatal(message:string) {
-      this.logTracker.fatal.push(message);
-    }
-
-    error(message:string) {
-      this.logTracker.error.push(message);
-    }
-
-    warn(message:string) {
-      this.logTracker.warn.push(message);
-    }
-
-    info(message:string) {
-      this.logTracker.info.push(message);
-    }
-
-    debug(message:string) {
-      this.logTracker.debug.push(message);
-    }
-
-    trace(message:string) {
-      this.logTracker.trace.push(message);
+    log(level:string, message:string) {
+      
     }
   }
 });
