@@ -7,10 +7,11 @@ import { Logger } from './logging/logger.service';
 import { IntroModule } from './intro/intro.module';
 import { GameModule } from './game/game.module';
 import { By }           from '@angular/platform-browser';
+import { ReplayModule } from './replay/replay.module';
 import {APP_BASE_HREF} from '@angular/common';
 
 describe('App: AngTest', () => {
-  
+
   const expectedTitle = 'Tic-tac-toe';
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -18,26 +19,26 @@ describe('App: AngTest', () => {
         AppComponent
       ],
       imports: [
-        IntroModule, GameModule, AppRoutingModule
+        IntroModule, GameModule, AppRoutingModule, ReplayModule
       ],
-      providers: [Logger, 
+      providers: [Logger,
       {provide: APP_BASE_HREF, useValue : '/' }]
     });
-    
+
   });
 
   it(`should have as title 'Tic-tac-toe'`, async(() => {
-    let fixture = TestBed.createComponent(AppComponent); 
+    let fixture = TestBed.createComponent(AppComponent);
     let app = fixture.debugElement.componentInstance;
     expect(app.title).toEqual(expectedTitle);
   }));
-  
+
   it(`should have a navigation bar`, async(() => {
-    let fixture = TestBed.createComponent(AppComponent); 
+    let fixture = TestBed.createComponent(AppComponent);
     let nav = fixture.debugElement.nativeElement.querySelector('nav');
     expect(nav).not.toBeNull();
   }));
-  
+
   class MockLogger extends Logger {
     logTracker = {
       fatal: [],
@@ -47,7 +48,7 @@ describe('App: AngTest', () => {
       debug: [],
       trace: []
     }
-    
+
     fatal(message:string) {
       this.logTracker.fatal.push(message);
     }
@@ -73,4 +74,3 @@ describe('App: AngTest', () => {
     }
   }
 });
-

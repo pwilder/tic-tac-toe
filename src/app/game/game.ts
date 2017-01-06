@@ -11,6 +11,7 @@ export class GameData {
 }
 
 export class GameAttributes {
+  timestamp:number; 
   moveList:Array<Move>;
 }
 
@@ -22,6 +23,7 @@ export class GameBuilder {
     this.game.data.id = generateUuid();
     this.game.data.attributes = new GameAttributes();
     this.game.data.attributes.moveList = new Array<Move>();
+    this.game.data.attributes.timestamp = new Date().getTime();
   }
   
   toGame():Game {

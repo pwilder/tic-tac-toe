@@ -1,0 +1,18 @@
+Old Games:
+<select [(ngModel)]="selectedGame" name="selectedGame">
+  <option [ngValue]="null">Select Game</option>
+  <option *ngFor="let game of oldGames" [ngValue]="game">{{game.data.id}}</option>
+</select>
+<button type="button" (click)="loadReplays()">Refresh</button>
+
+<br><br><br>
+GameIDs: {{gameIds}}
+<br>
+
+<table class="solidBorders">
+    <tr *ngFor="let row of collections" class="solidBorders">
+        <td *ngFor="let square of row" class="solidBorders boardPadding">
+            {{square.val}}
+        </td>
+    </tr>
+</table>

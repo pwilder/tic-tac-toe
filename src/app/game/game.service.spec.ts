@@ -95,4 +95,15 @@ describe('GameService', () => {
     })
   }));
   
+  it(`fetches all games when getHistory is called`, async(() => {
+    let gs = new GameService();
+    gs.createGameInstance().then((id) => {
+      gs.createGameInstance().then((id2) => {
+        gs.getAllHistory().then((gameArray) => {
+          expect(gameArray.length).toEqual(2);
+        })
+      })
+    })
+  }));
+  
 });

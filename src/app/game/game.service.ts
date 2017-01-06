@@ -64,6 +64,17 @@ export class GameService {
     return null;
   }
   
+  getAllHistory():Promise<Array<Game>> {
+    let localHistory = this.gameHistory;
+    return new Promise(function(resolve, reject) {
+      let returnArray:Array<Game> = [];
+      for (let key in localHistory) {
+        returnArray.push(localHistory[key])
+      }
+      resolve(returnArray);
+    });
+  }
+  
   getHistory(gameId:string):Promise<Game> {
     let localHistory = this.gameHistory;
     return new Promise(function(resolve, reject) {
